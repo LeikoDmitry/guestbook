@@ -1,0 +1,25 @@
+version: "3.3"
+
+services:
+  db:
+    image: postgres:12
+    environment:
+      POSTGRES_USER: coolmen
+      POSTGRES_PASSWORD: coolmen
+      POSTGRES_DB: guestbook
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  redis:
+    image: redis:5
+    ports:
+     - 6379:6379
+    volumes:
+    -  redis_data:/data
+
+volumes:
+  db_data: {}
+  redis_data: {}
+
