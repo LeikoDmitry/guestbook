@@ -70,7 +70,7 @@ class ConferenceController extends AbstractController
                 try {
                     $photo->move($photoDir, $filename);
                 } catch (FileException $fileException) {
-
+                    // Some logger
                 }
                 $comment->setPhotoFilename($filename);
             }

@@ -19,6 +19,17 @@ services:
     volumes:
     -  redis_data:/data
 
+  php:
+    build: ./docker/php
+    volumes:
+      - .:/code
+      - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+    command: symfony server:start
+
 volumes:
   db_data: {}
   redis_data: {}
