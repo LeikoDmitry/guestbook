@@ -8,6 +8,9 @@
     {% if comments|length > 0 %}
         {% for comment in comments %}
             <h4>{{ comment.author }}</h4>
+            {% if comment.photoFilename %}
+                <div><img src="{{ asset('uploads/photos/') }}{{ comment.photoFilename }}" alt="Author Image" /></div>
+            {% endif %}
             <small>
                 {{ comment.createdAt|format_datetime('medium', 'short') }}
             </small>

@@ -7,13 +7,15 @@ use App\Entity\Conference;
 use App\Form\CommentTypeFormType;
 use App\Repository\CommentRepository;
 use App\Repository\ConferenceRepository;
+use App\Spam\Checker;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Exception;
+use RuntimeException;
 
 class ConferenceController extends AbstractController
 {
@@ -43,20 +45,26 @@ class ConferenceController extends AbstractController
     /**
      * @Route("/conference/{slug}", name="conference")
      *
-     * @param Request  $request
-     * @param Conference  $conference
-     * @param CommentRepository  $commentRepository
+     * @param Request $request
+     * @param Conference $conference
+     * @param CommentRepository $commentRepository
+     * @param Checker $checker
      * @param $photoDir string
+     * @param LoggerInterface $logger
      *
      * @return Response
-     * @throws Exception
-     * @throws FileException
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
     public function show(
         Request $request,
         Conference $conference,
         CommentRepository $commentRepository,
-        string $photoDir
+        Checker $checker,
+        string $photoDir,
+        LoggerInterface $logger
     )
     {
         $comment = new Comment();
@@ -70,11 +78,20 @@ class ConferenceController extends AbstractController
                 try {
                     $photo->move($photoDir, $filename);
                 } catch (FileException $fileException) {
-                    // Some logger
+                    $logger->debug($fileException->getMessage());
                 }
                 $comment->setPhotoFilename($filename);
             }
             $this->entityManager->persist($comment);
+            $context = [
+                'user_ip' => $request->getClientIp(),
+                'user_agent' => $request->headers->get('user-agent'),
+                'referrer' => $request->headers->get('referer'),
+                'permalink' => $request->getUri(),
+            ];
+            if (2 === $checker->getSpamScope($comment, $context)) {
+                throw new RuntimeException('Blatant spam, go away!');
+            }
             $this->entityManager->flush();
             $this->redirectToRoute('conference', ['slug' => $conference->getSlug()]);
         }
