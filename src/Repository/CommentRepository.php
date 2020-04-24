@@ -20,6 +20,7 @@ class CommentRepository extends ServiceEntityRepository
      * @var int
      */
     public const PAGINATOR_PER_PAGE = 2;
+    public const COMMENT_STATUS_PUBLISHED = 'published';
 
     public function __construct(ManagerRegistry $registry)
     {
@@ -35,7 +36,9 @@ class CommentRepository extends ServiceEntityRepository
     {
         $query = $this->createQueryBuilder('c')
             ->andWhere('c.conference = :conference')
+            ->andWhere('c.state = :state')
             ->setParameter('conference', $conference)
+            ->setParameter('state', static::COMMENT_STATUS_PUBLISHED)
             ->orderBy('c.createdAt', 'DESC')
             ->setMaxResults(static::PAGINATOR_PER_PAGE)
             ->setFirstResult($offset)

@@ -1,6 +1,6 @@
 FROM php:7.4-fpm
 
-RUN apt-get update && apt-get install -y wget git g++ zip unzip \
+RUN apt-get update && apt-get install -y wget git g++ zip unzip librabbitmq-dev \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libpng-dev \
@@ -12,9 +12,10 @@ RUN apt-get update && apt-get install -y wget git g++ zip unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-configure opcache --enable-opcache \
     && docker-php-ext-install -j$(nproc) gd pgsql pdo_pgsql intl opcache zip \
-    && pecl install xdebug-2.8.1 apcu \
+    && pecl install xdebug-2.8.1 apcu amqp \
     && docker-php-ext-enable xdebug \
-    && docker-php-ext-enable apcu
+    && docker-php-ext-enable apcu \
+    && docker-php-ext-enable amqp
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
 RUN wget https://get.symfony.com/cli/installer -O - | bash && mv ~/.symfony/bin/symfony /usr/local/bin/symfony
