@@ -8,6 +8,8 @@ RUN apt-get update && apt-get install -y wget git g++ zip unzip librabbitmq-dev 
         libonig-dev \
         libicu-dev \
         libzip-dev \
+        graphviz-dev \
+        graphviz \
     && docker-php-ext-configure intl \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-configure opcache --enable-opcache \
