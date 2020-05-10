@@ -20,6 +20,10 @@ class CommentRepository extends ServiceEntityRepository
      * @var int
      */
     public const PAGINATOR_PER_PAGE = 2;
+
+    /**
+     * @var string
+     */
     public const COMMENT_STATUS_PUBLISHED = 'published';
 
     public function __construct(ManagerRegistry $registry)
