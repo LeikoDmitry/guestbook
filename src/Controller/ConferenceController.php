@@ -30,6 +30,11 @@ class ConferenceController extends AbstractController
      */
     private $messageBus;
 
+    /**
+     * @var int
+     */
+    private const CACHE_EXPIRED = 3600;
+
     public function __construct(EntityManagerInterface $entityManager, MessageBusInterface $messageBus)
     {
         $this->entityManager = $entityManager;
@@ -45,8 +50,11 @@ class ConferenceController extends AbstractController
     public function index(ConferenceRepository $conferenceRepository)
     {
         $conferences = $conferenceRepository->findAll();
+        $response = $this->render('conference/index.html.twig', compact('conferences'));
+        $response->setSharedMaxAge(static::CACHE_EXPIRED);
+        $response->setMaxAge(static::CACHE_EXPIRED);
 
-        return $this->render('conference/index.html.twig', compact('conferences'));
+        return $response;
     }
 
     /**
