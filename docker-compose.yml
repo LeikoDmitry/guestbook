@@ -35,6 +35,14 @@ services:
       - 8000:8000
     command: symfony server:start
 
+  nodejs:
+    image: node:14
+    working_dir: /code
+    volumes:
+      - .:/code
+    command: >
+        bash -c "yarn install && yarn watch"
+
 volumes:
   db_data: {}
   redis_data: {}

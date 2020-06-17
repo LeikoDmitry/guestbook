@@ -52,7 +52,6 @@ class ConferenceController extends AbstractController
         $conferences = $conferenceRepository->findAll();
         $response = $this->render('conference/index.html.twig', compact('conferences'));
         $response->setSharedMaxAge(static::CACHE_EXPIRED);
-        $response->setMaxAge(static::CACHE_EXPIRED);
 
         return $response;
     }
@@ -105,13 +104,13 @@ class ConferenceController extends AbstractController
         }
         $offset = max(0, $request->query->getInt('offset', 0));
         $comments = $commentRepository->getCommentPaginator($conference, $offset);
-        $prev = $offset - CommentRepository::PAGINATOR_PER_PAGE;
+        $previous = $offset - CommentRepository::PAGINATOR_PER_PAGE;
         $next = min(count($comments), $offset + CommentRepository::PAGINATOR_PER_PAGE);
 
         return $this->render('conference/show.html.twig', compact(
             'conference',
             'comments',
-            'prev',
+            'previous',
             'next',
             'commentForm'
         ));
